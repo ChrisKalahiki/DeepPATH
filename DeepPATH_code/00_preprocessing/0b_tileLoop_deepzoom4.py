@@ -2,17 +2,17 @@
     File name: 0b_tileLoop_deepzoom.py
     Date created: March/2017
 
-	Source:
-	Tiling code inspired from
-	https://github.com/openslide/openslide-python/blob/master/examples/deepzoom/deepzoom_tile.py
-	which is Copyright (c) 2010-2015 Carnegie Mellon University
-	The code has been extensively modified 
+    Source:
+    Tiling code inspired from
+    https://github.com/openslide/openslide-python/blob/master/examples/deepzoom/deepzoom_tile.py
+    which is Copyright (c) 2010-2015 Carnegie Mellon University
+    The code has been extensively modified 
 
-	Objective:
-	Tile svs, jpg or dcm images with the possibility of rejecting some tiles based based on xml or jpg masks
+    Objective:
+    Tile svs, jpg or dcm images with the possibility of rejecting some tiles based based on xml or jpg masks
 
-	Be careful:
-	Overload of the node - may have memory issue if node is shared with other jobs.
+    Be careful:
+    Overload of the node - may have memory issue if node is shared with other jobs.
 '''
 
 from __future__ import print_function
@@ -32,7 +32,7 @@ from multiprocessing import Process, JoinableQueue
 import time
 import os
 import sys
-import dicom
+import pydicom
 # from scipy.misc import imsave
 from imageio import imwrite as imsave
 # from scipy.misc import imread
@@ -159,7 +159,7 @@ class TileWorker(Process):
                                 TileMaskO[...,0] = (TileMask[:,:].astype(float)  / maxVal * 255.0).astype(int)
                                 TileMaskO[...,1] = (TileMask[:,:].astype(float)  / maxVal * 255.0).astype(int)
                                 TileMaskO[...,2] = (TileMask[:,:].astype(float)  / maxVal * 255.0).astype(int)
-                                TileMaskO = numpy.array(Image.fromarray(TileMaskO).resize(arr.shape[0], arr.shape[1],3))
+                                TileMaskO = np.array(Image.fromarray(TileMaskO).resize(arr.shape[0], arr.shape[1],3))
                                 # TileMaskO = imresize(TileMaskO, (arr.shape[0], arr.shape[1],3))
                                 TileMaskO[TileMaskO<10] = 0
                                 TileMaskO[TileMaskO>=10] = 255
@@ -490,7 +490,7 @@ class DeepZoomImageTiler(object):
                     else:
                         isLabelOK = False
                 except:
-                	isLabelOK = False
+                    isLabelOK = False
             if Attribute_Name == "non_selected_regions":
                 isLabelOK = True
 
@@ -549,7 +549,7 @@ class DeepZoomImageTiler(object):
         mask = np.array(img)
         #print(mask.shape)
         if Attribute_Name == "non_selected_regions":
-        	# scipy.misc.toimage(255-mask).save(os.path.join(os.path.split(self._basename[:-1])[0], "mask_" + os.path.basename(self._basename) + "_" + Attribute_Name + ".jpeg"))
+            # scipy.misc.toimage(255-mask).save(os.path.join(os.path.split(self._basename[:-1])[0], "mask_" + os.path.basename(self._basename) + "_" + Attribute_Name + ".jpeg"))
                 Image.fromarray(255-mask).save(os.path.join(os.path.split(self._basename[:-1])[0], "mask_" + os.path.basename(self._basename) + "_" + Attribute_Name + ".jpeg"))
         else:
            if self._mask_type==0:
@@ -682,15 +682,15 @@ class DeepZoomStaticTiler(object):
 
 
 def ImgWorker(queue):
-	# print("ImgWorker started")
-	while True:
-		cmd = queue.get()			
-		if cmd is None:
-			queue.task_done()
-			break
-		# print("Execute: %s" % (cmd))
-		subprocess.Popen(cmd, shell=True).wait()
-		queue.task_done()
+    # print("ImgWorker started")
+    while True:
+        cmd = queue.get()            
+        if cmd is None:
+            queue.task_done()
+            break
+        # print("Execute: %s" % (cmd))
+        subprocess.Popen(cmd, shell=True).wait()
+        queue.task_done()
 
 def xml_read_labels(xmldir, Fieldxml):
         try:
@@ -713,266 +713,267 @@ def xml_read_labels(xmldir, Fieldxml):
 
 
 if __name__ == '__main__':
-	parser = OptionParser(usage='Usage: %prog [options] <slide>')
+    parser = OptionParser(usage='Usage: %prog [options] <slide>')
 
-	parser.add_option('-L', '--ignore-bounds', dest='limit_bounds',
-		default=True, action='store_false',
-		help='display entire scan area')
-	parser.add_option('-e', '--overlap', metavar='PIXELS', dest='overlap',
-		type='int', default=1,
-		help='overlap of adjacent tiles [1]')
-	parser.add_option('-f', '--format', metavar='{jpeg|png}', dest='format',
-		default='jpeg',
-		help='image format for tiles [jpeg]')
-	parser.add_option('-j', '--jobs', metavar='COUNT', dest='workers',
-		type='int', default=4,
-		help='number of worker processes to start [4]')
-	parser.add_option('-o', '--output', metavar='NAME', dest='basename',
-		help='base name of output file')
-	parser.add_option('-Q', '--quality', metavar='QUALITY', dest='quality',
-		type='int', default=90,
-		help='JPEG compression quality [90]')
-	parser.add_option('-r', '--viewer', dest='with_viewer',
-		action='store_true',
-		help='generate directory tree with HTML viewer')
-	parser.add_option('-s', '--size', metavar='PIXELS', dest='tile_size',
-		type='int', default=254,
-		help='tile size [254]')
-	parser.add_option('-B', '--Background', metavar='PIXELS', dest='Bkg',
-		type='float', default=50,
-		help='Max background threshold [50]; percentager of background allowed')
-	parser.add_option('-x', '--xmlfile', metavar='NAME', dest='xmlfile',
-		help='xml file if needed')
-	parser.add_option('-F', '--Fieldxml', metavar='{Name|Value}', dest='Fieldxml',
-		default='Value',
-		help='which field of the xml file is the label saved')
-	parser.add_option('-m', '--mask_type', metavar='COUNT', dest='mask_type',
-		type='int', default=1,
-		help='if xml file is used, keep tile within the ROI (1) or outside of it (0)')
-	parser.add_option('-R', '--ROIpc', metavar='PIXELS', dest='ROIpc',
-		type='float', default=50,
-		help='To be used with xml file - minimum percentage of tile covered by ROI (white)')
-	parser.add_option('-l', '--oLabelref', metavar='NAME', dest='oLabelref',
-		help='To be used with xml file - Only tile for label which contains the characters in oLabel')
-	parser.add_option('-S', '--SaveMasks', metavar='NAME', dest='SaveMasks',
-		default=False,
-		help='set to yes if you want to save ALL masks for ALL tiles (will be saved in same directory with <mask> suffix)')
-	parser.add_option('-t', '--tmp_dcm', metavar='NAME', dest='tmp_dcm',
-		help='base name of output folder to save intermediate dcm images converted to jpg (we assume the patient ID is the folder name in which the dcm images are originally saved)')
-	parser.add_option('-M', '--Mag', metavar='PIXELS', dest='Mag',
-		type='float', default=-1,
-		help='Magnification at which tiling should be done (-1 of all)')
-	parser.add_option('-N', '--normalize', metavar='NAME', dest='normalize',
-		help='if normalization is needed, N list the mean and std for each channel. For example \'57,22,-8,20,10,5\' with the first 3 numbers being the targeted means, and then the targeted stds')
-
-
+    parser.add_option('-L', '--ignore-bounds', dest='limit_bounds',
+        default=True, action='store_false',
+        help='display entire scan area')
+    parser.add_option('-e', '--overlap', metavar='PIXELS', dest='overlap',
+        type='int', default=1,
+        help='overlap of adjacent tiles [1]')
+    parser.add_option('-f', '--format', metavar='{jpeg|png}', dest='format',
+        default='jpeg',
+        help='image format for tiles [jpeg]')
+    parser.add_option('-j', '--jobs', metavar='COUNT', dest='workers',
+        type='int', default=4,
+        help='number of worker processes to start [4]')
+    parser.add_option('-o', '--output', metavar='NAME', dest='basename',
+        help='base name of output file')
+    parser.add_option('-Q', '--quality', metavar='QUALITY', dest='quality',
+        type='int', default=90,
+        help='JPEG compression quality [90]')
+    parser.add_option('-r', '--viewer', dest='with_viewer',
+        action='store_true',
+        help='generate directory tree with HTML viewer')
+    parser.add_option('-s', '--size', metavar='PIXELS', dest='tile_size',
+        type='int', default=254,
+        help='tile size [254]')
+    parser.add_option('-B', '--Background', metavar='PIXELS', dest='Bkg',
+        type='float', default=50,
+        help='Max background threshold [50]; percentager of background allowed')
+    parser.add_option('-x', '--xmlfile', metavar='NAME', dest='xmlfile',
+        help='xml file if needed')
+    parser.add_option('-F', '--Fieldxml', metavar='{Name|Value}', dest='Fieldxml',
+        default='Value',
+        help='which field of the xml file is the label saved')
+    parser.add_option('-m', '--mask_type', metavar='COUNT', dest='mask_type',
+        type='int', default=1,
+        help='if xml file is used, keep tile within the ROI (1) or outside of it (0)')
+    parser.add_option('-R', '--ROIpc', metavar='PIXELS', dest='ROIpc',
+        type='float', default=50,
+        help='To be used with xml file - minimum percentage of tile covered by ROI (white)')
+    parser.add_option('-l', '--oLabelref', metavar='NAME', dest='oLabelref',
+        help='To be used with xml file - Only tile for label which contains the characters in oLabel')
+    parser.add_option('-S', '--SaveMasks', metavar='NAME', dest='SaveMasks',
+        default=False,
+        help='set to yes if you want to save ALL masks for ALL tiles (will be saved in same directory with <mask> suffix)')
+    parser.add_option('-t', '--tmp_dcm', metavar='NAME', dest='tmp_dcm',
+        help='base name of output folder to save intermediate dcm images converted to jpg (we assume the patient ID is the folder name in which the dcm images are originally saved)')
+    parser.add_option('-M', '--Mag', metavar='PIXELS', dest='Mag',
+        type='float', default=-1,
+        help='Magnification at which tiling should be done (-1 of all)')
+    parser.add_option('-N', '--normalize', metavar='NAME', dest='normalize',
+        help='if normalization is needed, N list the mean and std for each channel. For example \'57,22,-8,20,10,5\' with the first 3 numbers being the targeted means, and then the targeted stds')
 
 
-	(opts, args) = parser.parse_args()
 
 
-	try:
-		slidepath = args[0]
-	except IndexError:
-		parser.error('Missing slide argument')
-	if opts.basename is None:
-		opts.basename = os.path.splitext(os.path.basename(slidepath))[0]
-	if opts.xmlfile is None:
-		opts.xmlfile = ''
+    (opts, args) = parser.parse_args()
 
-	try:
-		if opts.normalize is not None:
-			opts.normalize = [float(x) for x in opts.normalize.split(',')]
-			if len(opts.normalize) != 6:
-				opts.normalize = ''
-				parser.error("ERROR: NO NORMALIZATION APPLIED: input vector does not have the right length - 6 values expected")
-		else:
-			opts.normalize  = ''
 
-	except:
-		opts.normalize = ''
-		parser.error("ERROR: NO NORMALIZATION APPLIED: input vector does not have the right format")
+    try:
+        slidepath = args[0]
+    except IndexError:
+        parser.error('Missing slide argument')
+    if opts.basename is None:
+        opts.basename = os.path.splitext(os.path.basename(slidepath))[0]
+    if opts.xmlfile is None:
+        opts.xmlfile = ''
+
+    try:
+        if opts.normalize is not None:
+            opts.normalize = [float(x) for x in opts.normalize.split(',')]
+            if len(opts.normalize) != 6:
+                opts.normalize = ''
+                parser.error("ERROR: NO NORMALIZATION APPLIED: input vector does not have the right length - 6 values expected")
+        else:
+            opts.normalize  = ''
+
+    except:
+        opts.normalize = ''
+        parser.error("ERROR: NO NORMALIZATION APPLIED: input vector does not have the right format")
         #if ss != '':
         #    if os.path.isdir(opts.xmlfile):
             
 
-	# Initialization
-	# imgExample = "/ifs/home/coudrn01/NN/Lung/RawImages/*/*svs"
-	# tile_size = 512
-	# max_number_processes = 10
-	# NbrCPU = 4
+    # Initialization
+    # imgExample = "/ifs/home/coudrn01/NN/Lung/RawImages/*/*svs"
+    # tile_size = 512
+    # max_number_processes = 10
+    # NbrCPU = 4
 
 
-	# get  images from the data/ file.
-	files = glob(slidepath)  
-	#ImgExtension = os.path.splitext(slidepath)[1]
-	ImgExtension = slidepath.split('*')[-1]
-	#files
-	#len(files)
-	# print(args)
-	# print(args[0])
-	# print(slidepath)
-	# print(files)
-	# print("***********************")
+    # get  images from the data/ file.
+    files = glob(slidepath)  
+    #ImgExtension = os.path.splitext(slidepath)[1]
+    ImgExtension = slidepath.split('*')[-1]
+    #files
+    #len(files)
+    # print(args)
+    # print(args[0])
+    # print(slidepath)
+    # print(files)
+    # print("***********************")
 
-	'''
-	dz_queue = JoinableQueue()
-	procs = []
-	print("Nb of processes:")
-	print(opts.max_number_processes)
-	for i in range(opts.max_number_processes):
-		p = Process(target = ImgWorker, args = (dz_queue,))
-		#p.deamon = True
-		p.setDaemon = True
-		p.start()
-		procs.append(p)
-	'''
-	files = sorted(files)
-	for imgNb in range(len(files)):
-		filename = files[imgNb]
-		#print(filename)
-		opts.basenameJPG = os.path.splitext(os.path.basename(filename))[0]
-		print("processing: " + opts.basenameJPG + " with extension: " + ImgExtension)
-		#opts.basenameJPG = os.path.splitext(os.path.basename(slidepath))[0]
-		#if os.path.isdir("%s_files" % (basename)):
-		#	print("EXISTS")
-		#else:
-		#	print("Not Found")
+    '''
+    dz_queue = JoinableQueue()
+    procs = []
+    print("Nb of processes:")
+    print(opts.max_number_processes)
+    for i in range(opts.max_number_processes):
+        p = Process(target = ImgWorker, args = (dz_queue,))
+        #p.deamon = True
+        p.setDaemon = True
+        p.start()
+        procs.append(p)
+    '''
+    files = sorted(files)
+    print(len(files))
+    for imgNb in range(len(files)):
+        filename = files[imgNb]
+        #print(filename)
+        opts.basenameJPG = os.path.splitext(os.path.basename(filename))[0]
+        print("processing: " + opts.basenameJPG + " with extension: " + ImgExtension)
+        #opts.basenameJPG = os.path.splitext(os.path.basename(slidepath))[0]
+        #if os.path.isdir("%s_files" % (basename)):
+        #    print("EXISTS")
+        #else:
+        #    print("Not Found")
 
-		if ("dcm" in ImgExtension) :
-			print("convert %s dcm to jpg" % filename)
-			if opts.tmp_dcm is None:
-				parser.error('Missing output folder for dcm>jpg intermediate files')
-			elif not os.path.isdir(opts.tmp_dcm):
-				parser.error('Missing output folder for dcm>jpg intermediate files')
+        if ("dcm" in ImgExtension) :
+            print("convert %s dcm to jpg" % filename)
+            if opts.tmp_dcm is None:
+                parser.error('Missing output folder for dcm>jpg intermediate files')
+            elif not os.path.isdir(opts.tmp_dcm):
+                parser.error('Missing output folder for dcm>jpg intermediate files')
 
-			if filename[-3:] == 'jpg':
+            if filename[-3:] == 'jpg':
                             continue
-			ImageFile=dicom.read_file(filename)
-			im1 = ImageFile.pixel_array
-			maxVal = float(im1.max())
-			minVal = float(im1.min())
-			height = im1.shape[0]
-			width = im1.shape[1]
-			image = np.zeros((height,width,3), 'uint8')
-			image[...,0] = ((im1[:,:].astype(float) - minVal)  / (maxVal - minVal) * 255.0).astype(int)
-			image[...,1] = ((im1[:,:].astype(float) - minVal)  / (maxVal - minVal) * 255.0).astype(int)
-			image[...,2] = ((im1[:,:].astype(float) - minVal)  / (maxVal - minVal) * 255.0).astype(int)
-			# dcm_ID = os.path.basename(os.path.dirname(filename))
-			# opts.basenameJPG = dcm_ID + "_" + opts.basenameJPG
-			filename = os.path.join(opts.tmp_dcm, opts.basenameJPG + ".jpg")
-			# print(filename)
-			imsave(filename,image)
+            ImageFile=pydicom.read_file(filename)
+            im1 = ImageFile.pixel_array
+            maxVal = float(im1.max())
+            minVal = float(im1.min())
+            height = im1.shape[0]
+            width = im1.shape[1]
+            image = np.zeros((height,width,3), 'uint8')
+            image[...,0] = ((im1[:,:].astype(float) - minVal)  / (maxVal - minVal) * 255.0).astype(int)
+            image[...,1] = ((im1[:,:].astype(float) - minVal)  / (maxVal - minVal) * 255.0).astype(int)
+            image[...,2] = ((im1[:,:].astype(float) - minVal)  / (maxVal - minVal) * 255.0).astype(int)
+            # dcm_ID = os.path.basename(os.path.dirname(filename))
+            # opts.basenameJPG = dcm_ID + "_" + opts.basenameJPG
+            filename = os.path.join(opts.tmp_dcm, opts.basenameJPG + ".jpg")
+            # print(filename)
+            imsave(filename,image)
 
-			output = os.path.join(opts.basename, opts.basenameJPG)
+            output = os.path.join(opts.basename, opts.basenameJPG)
 
-			try:
-				DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, '', ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
-			except Exception as e:
-				print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
-				print(e)
+            try:
+                DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, '', ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
+            except Exception as e:
+                print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
+                print(e)
 
-		#elif ("jpg" in ImgExtension) :
-		#	output = os.path.join(opts.basename, opts.basenameJPG)
-		#	if os.path.exists(output + "_files"):
-		#		print("Image %s already tiled" % opts.basenameJPG)
-		#		continue
+        #elif ("jpg" in ImgExtension) :
+        #    output = os.path.join(opts.basename, opts.basenameJPG)
+        #    if os.path.exists(output + "_files"):
+        #        print("Image %s already tiled" % opts.basenameJPG)
+        #        continue
 
-		#	DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, '', ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
+        #    DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, '', ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
 
-		elif opts.xmlfile != '':
-			xmldir = os.path.join(opts.xmlfile, opts.basenameJPG + '.xml')
-			# print("xml:")
-			# print(xmldir)
-			if os.path.isfile(xmldir):
-				if (opts.mask_type==1) or (opts.oLabelref!=''):
-					# either mask inside ROI, or mask outside but a reference label exist
-					xml_labels, xml_valid = xml_read_labels(xmldir, opts.Fieldxml)
-					if (opts.mask_type==1):
-						# No inverse mask
-						Nbr_ROIs_ForNegLabel = 1
-					elif (opts.oLabelref!=''):
-						# Inverse mask and a label reference exist
-						Nbr_ROIs_ForNegLabel = 0
+        elif opts.xmlfile != '':
+            xmldir = os.path.join(opts.xmlfile, opts.basenameJPG + '.xml')
+            # print("xml:")
+            # print(xmldir)
+            if os.path.isfile(xmldir):
+                if (opts.mask_type==1) or (opts.oLabelref!=''):
+                    # either mask inside ROI, or mask outside but a reference label exist
+                    xml_labels, xml_valid = xml_read_labels(xmldir, opts.Fieldxml)
+                    if (opts.mask_type==1):
+                        # No inverse mask
+                        Nbr_ROIs_ForNegLabel = 1
+                    elif (opts.oLabelref!=''):
+                        # Inverse mask and a label reference exist
+                        Nbr_ROIs_ForNegLabel = 0
 
-					for oLabel in xml_labels:
-						# print("label is %s and ref is %s" % (oLabel, opts.oLabelref))
-						if (opts.oLabelref in oLabel) or (opts.oLabelref==''):
-							# is a label is identified 
-							if (opts.mask_type==0):
-								# Inverse mask and label exist in the image
-								Nbr_ROIs_ForNegLabel += 1
-								# there is a label, and map is to be inverted
-								output = os.path.join(opts.basename, oLabel+'_inv', opts.basenameJPG)
-								if not os.path.exists(os.path.join(opts.basename, oLabel+'_inv')):
-									os.makedirs(os.path.join(opts.basename, oLabel+'_inv'))
-							else:
-								Nbr_ROIs_ForNegLabel += 1
-								output = os.path.join(opts.basename, oLabel, opts.basenameJPG)
-								if not os.path.exists(os.path.join(opts.basename, oLabel)):
-									os.makedirs(os.path.join(opts.basename, oLabel))
-							if 1:
-							#try:
-								DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, oLabel, ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
-							#except:
-							#	print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
-						if Nbr_ROIs_ForNegLabel==0:
-							print("label %s is not in that image; invert everything" % (opts.oLabelref))
-							# a label ref was given, and inverse mask is required but no ROI with this label in that map --> take everything
-							oLabel = opts.oLabelref
-							output = os.path.join(opts.basename, opts.oLabelref+'_inv', opts.basenameJPG)
-							if not os.path.exists(os.path.join(opts.basename, oLabel+'_inv')):
-								os.makedirs(os.path.join(opts.basename, oLabel+'_inv'))
-							if 1:
-							#try:
-								DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, oLabel, ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
-							#except:
-							#	print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
+                    for oLabel in xml_labels:
+                        # print("label is %s and ref is %s" % (oLabel, opts.oLabelref))
+                        if (opts.oLabelref in oLabel) or (opts.oLabelref==''):
+                            # is a label is identified 
+                            if (opts.mask_type==0):
+                                # Inverse mask and label exist in the image
+                                Nbr_ROIs_ForNegLabel += 1
+                                # there is a label, and map is to be inverted
+                                output = os.path.join(opts.basename, oLabel+'_inv', opts.basenameJPG)
+                                if not os.path.exists(os.path.join(opts.basename, oLabel+'_inv')):
+                                    os.makedirs(os.path.join(opts.basename, oLabel+'_inv'))
+                            else:
+                                Nbr_ROIs_ForNegLabel += 1
+                                output = os.path.join(opts.basename, oLabel, opts.basenameJPG)
+                                if not os.path.exists(os.path.join(opts.basename, oLabel)):
+                                    os.makedirs(os.path.join(opts.basename, oLabel))
+                            if 1:
+                            #try:
+                                DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, oLabel, ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
+                            #except:
+                            #    print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
+                        if Nbr_ROIs_ForNegLabel==0:
+                            print("label %s is not in that image; invert everything" % (opts.oLabelref))
+                            # a label ref was given, and inverse mask is required but no ROI with this label in that map --> take everything
+                            oLabel = opts.oLabelref
+                            output = os.path.join(opts.basename, opts.oLabelref+'_inv', opts.basenameJPG)
+                            if not os.path.exists(os.path.join(opts.basename, oLabel+'_inv')):
+                                os.makedirs(os.path.join(opts.basename, oLabel+'_inv'))
+                            if 1:
+                            #try:
+                                DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, oLabel, ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
+                            #except:
+                            #    print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
 
-				else:
-					# Background
-					oLabel = "non_selected_regions"
-					output = os.path.join(opts.basename, oLabel, opts.basenameJPG)
-					if not os.path.exists(os.path.join(opts.basename, oLabel)):
-						os.makedirs(os.path.join(opts.basename, oLabel))
-					try:
-						DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, oLabel, ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
-					except Exception as e:
-						print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
-						print(e)
+                else:
+                    # Background
+                    oLabel = "non_selected_regions"
+                    output = os.path.join(opts.basename, oLabel, opts.basenameJPG)
+                    if not os.path.exists(os.path.join(opts.basename, oLabel)):
+                        os.makedirs(os.path.join(opts.basename, oLabel))
+                    try:
+                        DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, oLabel, ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
+                    except Exception as e:
+                        print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
+                        print(e)
 
-			else:
-				if (ImgExtension == ".jpg") | (ImgExtension == ".dcm") :
-					print("Input image to be tiled is jpg or dcm and not svs - will be treated as such")
-					output = os.path.join(opts.basename, opts.basenameJPG)
-					try:
-						DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, '', ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
-					except Exception as e:
-						print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
-						print(e)
+            else:
+                if (ImgExtension == ".jpg") | (ImgExtension == ".dcm") :
+                    print("Input image to be tiled is jpg or dcm and not svs - will be treated as such")
+                    output = os.path.join(opts.basename, opts.basenameJPG)
+                    try:
+                        DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, '', ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
+                    except Exception as e:
+                        print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
+                        print(e)
 
 
-				else:
-					print("No xml file found for slide %s.svs (expected: %s). Directory or xml file does not exist" %  (opts.basenameJPG, xmldir) )
-					continue
-		else:
-			output = os.path.join(opts.basename, opts.basenameJPG)
-			if os.path.exists(output + "_files"):
-				print("Image %s already tiled" % opts.basenameJPG)
-				continue
-			try:
-			#if True:
-				DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, '', ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
-			except Exception as e:
-				print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
-				print(e)
-	'''
-	dz_queue.join()
-	for i in range(opts.max_number_processes):
-		dz_queue.put( None )
-	'''
+                else:
+                    print("No xml file found for slide %s.svs (expected: %s). Directory or xml file does not exist" %  (opts.basenameJPG, xmldir) )
+                    continue
+        else:
+            output = os.path.join(opts.basename, opts.basenameJPG)
+            if os.path.exists(output + "_files"):
+                print("Image %s already tiled" % opts.basenameJPG)
+                continue
+            try:
+            #if True:
+                DeepZoomStaticTiler(filename, output, opts.format, opts.tile_size, opts.overlap, opts.limit_bounds, opts.quality, opts.workers, opts.with_viewer, opts.Bkg, opts.basenameJPG, opts.xmlfile, opts.mask_type, opts.ROIpc, '', ImgExtension, opts.SaveMasks, opts.Mag, opts.normalize, opts.Fieldxml).run()
+            except Exception as e:
+                print("Failed to process file %s, error: %s" % (filename, sys.exc_info()[0]))
+                print(e)
+    '''
+    dz_queue.join()
+    for i in range(opts.max_number_processes):
+        dz_queue.put( None )
+    '''
 
-	print("End")
+    print("End")
 
 
 

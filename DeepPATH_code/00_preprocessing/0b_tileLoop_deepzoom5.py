@@ -32,7 +32,7 @@ from multiprocessing import Process, JoinableQueue
 import time
 import os
 import sys
-import dicom
+import pydicom
 # from scipy.misc import imsave
 from imageio import imwrite as imsave
 # from scipy.misc import imread
@@ -889,7 +889,7 @@ if __name__ == '__main__':
 
 			if filename[-3:] == 'jpg':
                             continue
-			ImageFile=dicom.read_file(filename)
+			ImageFile=pydicom.read_file(filename)
 			im1 = ImageFile.pixel_array
 			maxVal = float(im1.max())
 			minVal = float(im1.min())
