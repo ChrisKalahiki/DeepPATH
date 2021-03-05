@@ -19,8 +19,8 @@ module load anaconda3/2020.07-gcc/8.3.1
 source activate deeppath
 ```
 
-## 1.4 Creating Bazel Binaries (First time only)
-I created these in my home directory.
+## 1.4 Creating Bazel Binaries (FIRST TIME ONLY!)
+I created these in my home directory. We can, however, discuss putting them in the project somewhere if that is preferred.
 ```
 mkdir bazel-src
 cd bazel-src
@@ -41,7 +41,9 @@ cd /zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code
 ## 2.1 Pre-processing - Tiling
 First, we can tile the images using the magnification (20x) and tile size of interest (512x512 px in example)
 ```
-python 00_preprocessing/0b_tileLoop_deepzoom4.py  -s 512 -e 0 -j 32 -B 50 -M 20 -o out/512px_Tiled "../../data/*/*svs"
+python 00_preprocessing/0b_tileLoop_deepzoom4.py  -s 512 -e 0 -j 32 -B 50 -M 20 -o out/512px_Tiled/AA "../../data/AfricanAmerican/*svs"
+
+python 00_preprocessing/0b_tileLoop_deepzoom4.py  -s 512 -e 0 -j 32 -B 50 -M 20 -o out/512px_Tiled/C "../../data/Caucasian/*svs"
 ```
 
 ## 2.2 Pre-processing - Sorting
@@ -55,20 +57,27 @@ python ../../00_preprocessing/0d_SortTiles.py --SourceFolder='../512px_Tiled/' -
 ## 2.3 Pre-processing - Convert to TFRecord
 Convert record into TFRecord files for each dataset
 ```
-mkdir out/r1_TFRecord_test
-mkdir out/r1_TFRecord_valid
-mkdir out/r1_TFRecord_train
+mkdir out/iia_TFRecord_test
+mkdir out/iia_TFRecord_valid
+mkdir out/iia_TFRecord_train
 
-python 00_preprocessing/TFRecord_2or3_Classes/build_TF_test.py --directory='out/r1_sorted_3Cla/'  --output_directory='out/r1_TFRecord_test' --num_threads=1 --one_FT_per_Tile=False --ImageSet_basename='test'
+python 00_preprocessing/TFRecord_2or3_Classes/build_TF_test.py --directory='out/iia_sorted_3Cla/'  --output_directory='out/iia_TFRecord_test' --num_threads=1 --one_FT_per_Tile=False --ImageSet_basename='test'
 
-python 00_preprocessing/TFRecord_2or3_Classes/build_TF_test.py --directory='out/r1_sorted_3Cla/'  --output_directory='out/r1_TFRecord_valid' --num_threads=1 --one_FT_per_Tile=False --ImageSet_basename='valid'
+python 00_preprocessing/TFRecord_2or3_Classes/build_TF_test.py --directory='out/iia_sorted_3Cla/'  --output_directory='out/iia_TFRecord_valid' --num_threads=1 --one_FT_per_Tile=False --ImageSet_basename='valid'
 
-python 00_preprocessing/TFRecord_2or3_Classes/build_image_data.py --directory='out/r1_sorted_3Cla/' --output_directory='out/r1_TFRecord_train' --train_shards=1024  --validation_shards=128 --num_threads=16
+python 00_preprocessing/TFRecord_2or3_Classes/build_image_data.py --directory='out/iia_sorted_3Cla/' --output_directory='out/iia_TFRecord_train' --train_shards=1024  --validation_shards=128 --num_threads=16
 ```
 
 ## 2.4 Train the 3-way Classifier
+Here we are going to train our inception model on the training set we created.
 ```
-mkdir out/r1_results
+mkdir out/iia_results
 
-01_training/xClasses/bazel-bin/inception/imagenet_train --num_gpus=2 --batch_size=100 --train_dir='out/r1_results' --data_dir='out/r1_TFRecord_train' --ClassNumber=2 --mode='0_softmax' --NbrOfImages=712 --save_step_for_chekcpoint=200 --max_steps=2001
+01_training/xClasses/bazel-bin/inception/imagenet_train --num_gpus=2 --batch_size=100 --train_dir='out/iia_results' --data_dir='out/iia_TFRecord_train' --ClassNumber=2 --mode='0_softmax' --NbrOfImages=712 --save_step_for_chekcpoint=200 --max_steps=2001
+```
+
+## 2.5 Validating Results
+We just want to run out model on the validation set we created.
+```
+python 02_testing/xClasses/nc_imagenet_eval.py --checkpoint_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_results/' --eval_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_valid' --data_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_TFRecord_valid'  --batch_size 300  --run_once --ImageSet_basename='valid_' --ClassNumber 1 --mode='0_softmax'  --TVmode='test'
 ```
