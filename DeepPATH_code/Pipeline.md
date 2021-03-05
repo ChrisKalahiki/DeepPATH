@@ -39,7 +39,7 @@ cd /zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code
 ```
 
 ## 2.1 Pre-processing - Tiling
-First, we can tile the images using the magnification (20x) and tile size of interest (512x512 px in example)
+First, we can tile the images using the magnification (20x) and tile size of interest (512x512 px in example). The reason we tile each set separately is because the metadata has no inherent way to distinguish race of each image. This causes the sort script to require separate subfolder names to use as labels.
 ```
 python 00_preprocessing/0b_tileLoop_deepzoom4.py  -s 512 -e 0 -j 32 -B 50 -M 20 -o out/512px_Tiled/AA "../../data/AfricanAmerican/*svs"
 
