@@ -1,0 +1,13 @@
+#PBS -N dzrpt_bcr_inception
+#PBS -l select=1:ncpus=30:mem=372gb:ngpus=2:gpu_model=any:interconnect=any,walltime=06:00:00
+#PBS -q dzrptlab
+
+module load openjdk/1.8.0_222-b10-gcc/8.3.1
+module load gcc/9.3.0
+module add anaconda3/5.0.1-gcc/8.3.1
+
+source activate deeppath
+
+cd /zfs/dzrptlab/DeepPATH/DeepPATH_code
+
+/01_training/xClasses/bazel-bin/inception/imagenet_train --num_gpus=1 --batch_size=100 --train_dir='r1_results' --data_dir='r1_TFRecord_train' --ClassNumber=1 --mode='0_softmax' --NbrOfImages=712 --save_step_for_chekcpoint=200 --max_steps=2001
