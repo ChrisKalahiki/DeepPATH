@@ -51,7 +51,7 @@ Next, we can sort the data into a train, test, and validation cohort for a 3-way
 ```
 mkdir out/iia_sorted_3Cla
 cd out/iia_sorted_3Cla
-python ../../00_preprocessing/0d_SortTiles.py --SourceFolder='../512px_Tiled/' --Magnification=20.0  --MagDiffAllowed=0 --SortingOption=10 --nSplit 0 --JsonFile='../../../../data/metadata.cart.complete-iia.json' --PercentTest=15 --PercentValid=15
+python ../../00_preprocessing/0d_SortTiles.py --SourceFolder='../512px_Tiled/' --Magnification=20.0  --MagDiffAllowed=0 --SortingOption=19 --nSplit 0 --JsonFile='../../../../data/metadata.cart.complete-iia.json' --PercentTest=15 --PercentValid=15
 ```
 
 ## 2.3 Pre-processing - Convert to TFRecord
