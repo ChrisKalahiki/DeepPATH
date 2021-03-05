@@ -33,9 +33,16 @@ env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
 This should create Bazel binaries in `~/bazel-src/output/`
 
 # 2. Normal Classification
+It is important to note that this portion of the pipeline will involve moving to the proper directory in Palmetto.
+```
+cd /zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code
+```
+
 ## 2.1 Pre-processing - Tiling
 First, we can tile the images using the magnification (20x) and tile size of interest (512x512 px in example)
+```
 python 00_preprocessing/0b_tileLoop_deepzoom4.py  -s 512 -e 0 -j 32 -B 50 -M 20 -o 512px_Tiled "../../data/*/*svs"
+```
 
 ## 2.2 Pre-processing - Sorting
 Next, we can sort the data into a train, test, and validation cohort for a 3-way classifier.
