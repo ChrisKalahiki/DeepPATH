@@ -15,7 +15,6 @@ qsub -I -l select=1:ncpus=10:mem=300gb:ngpus=2:gpu_model=any:interconnect=any,wa
 module load openjdk/1.8.0_222-b10-gcc/8.3.1
 module load gcc/9.3.0
 module load anaconda3/2020.07-gcc/8.3.1
-
 source activate deeppath
 ```
 
