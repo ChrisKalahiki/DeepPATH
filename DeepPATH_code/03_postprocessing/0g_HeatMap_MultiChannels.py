@@ -343,7 +343,7 @@ def main():
 	# print(idx)
 	# print(idx[0])
 	file1 = open(os.path.join(FLAGS.output_dir,"distribution.txt"),"a")
-	file1.write("image\tclass " + str(nClasses[0]) + "\tclass " + str(nClasses[1]) + "\tclass " + str(nClasses[2]) + "\n") 
+	file1.write("image\tclass " + str(nClasses[0]) + "\tclass " + str(nClasses[1]) + "\n") # "\tclass " + str(nClasses[2]) +
 	for slide in ListSlideNames.keys(): 
 		print("slide: " + slide)
 		if len(idx[0][slide][0]) > 0:
