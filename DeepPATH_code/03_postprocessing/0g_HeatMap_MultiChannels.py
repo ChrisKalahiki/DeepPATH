@@ -31,7 +31,7 @@ import matplotlib.colors as mcolors
 
 import scipy.misc
 from imageio import imwrite
-from scipy.misc import imread
+from imageio import imread
 
 FLAGS = None
 
