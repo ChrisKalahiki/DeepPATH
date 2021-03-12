@@ -20,8 +20,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import scipy.misc
-from scipy.misc import imsave
-from scipy.misc import imread
+from imageio import imwrite as imsave
+from imageio import imread
 from scipy.interpolate import spline
 import numpy as np
 
