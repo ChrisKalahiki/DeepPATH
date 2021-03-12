@@ -367,7 +367,7 @@ def main():
 			print("image not found:")
 			print(tile)
 			# break
-                        continue
+			continue
 
 		# remove slide number from image name:
 		cTileRootName =  '_'.join(os.path.basename(test_filename).split('_')[0:-2]) 
