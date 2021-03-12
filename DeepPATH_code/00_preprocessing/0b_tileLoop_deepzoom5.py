@@ -159,7 +159,7 @@ class TileWorker(Process):
                                 TileMaskO[...,0] = (TileMask[:,:].astype(float)  / maxVal * 255.0).astype(int)
                                 TileMaskO[...,1] = (TileMask[:,:].astype(float)  / maxVal * 255.0).astype(int)
                                 TileMaskO[...,2] = (TileMask[:,:].astype(float)  / maxVal * 255.0).astype(int)
-                                TileMaskO = numpy.array(Image.fromarray(TileMaskO).resize(arr.shape[0], arr.shape[1],3))
+                                TileMaskO = np.array(Image.fromarray(TileMaskO).resize(arr.shape[0], arr.shape[1],3))
                                 # TileMaskO = imresize(TileMaskO, (arr.shape[0], arr.shape[1],3))
                                 TileMaskO[TileMaskO<10] = 0
                                 TileMaskO[TileMaskO>=10] = 255

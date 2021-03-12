@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
 import scipy.misc
-from imageio import imwrite
+from imageio import imwrite as imsave
 from imageio import imread
 
 FLAGS = None
@@ -391,7 +391,7 @@ def main():
 		rgb[..., 1] = X2 * 255
 		rgb[..., 2] = X3 * 255
 		filename = os.path.join(FLAGS.output_dir,"CMap_" + slide + ".jpg")
-		imwrite(filename, rgb)
+		imsave(filename, rgb)
 		file1.write(slide + "\t" + str(count_tiles[slide][0] ) + "\t" + str(count_tiles[slide][1] ) + "\t" + str(count_tiles[slide][2] ) + "\n")
 	file1.close()
 

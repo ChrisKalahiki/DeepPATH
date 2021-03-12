@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
 import scipy.misc
-from imageio import imwrite
+from imageio import imwrite as imsave
 from imageio import imread
 
 FLAGS = None
