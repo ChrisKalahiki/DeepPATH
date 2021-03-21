@@ -40,9 +40,11 @@ cd /zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code
 ## 2.1 Pre-processing - Tiling
 First, we can tile the images using the magnification (20x) and tile size of interest (512x512 px in example). The reason we tile each set separately is because the metadata has no inherent way to distinguish race of each image. This causes the sort script to require separate subfolder names to use as labels.
 ```
-python 00_preprocessing/0b_tileLoop_deepzoom4.py  -s 512 -e 0 -j 32 -B 50 -M 20 -o out/512px_Tiled/AA "../../data/AfricanAmerican/*svs"
+python 00_preprocessing/0b_tileLoop_deepzoom4.py -s 512 -e 0 -j 32 -B 50 -M 20 -o out/512px_Tiled/AA "../../data/AfricanAmerican/*svs"
 
-python 00_preprocessing/0b_tileLoop_deepzoom4.py  -s 512 -e 0 -j 32 -B 50 -M 20 -o out/512px_Tiled/C "../../data/Caucasian/*svs"
+python 00_preprocessing/0b_tileLoop_deepzoom4.py -s 512 -e 0 -j 32 -B 50 -M 20 -o out/512px_Tiled/C "../../data/Caucasian/*svs"
+
+python 00_preprocessing/0b_tileLoop_deepzoom4.py -s 512 -e 0 -j 32 -B 50 -M 20 -o out/512px_Tiled/H "../../data/Hispanic/*svs"
 ```
 
 ## 2.2 Pre-processing - Sorting
@@ -72,11 +74,11 @@ Here we are going to train our inception model on the training set we created.
 ```
 mkdir out/iia_results
 
-01_training/xClasses/bazel-bin/inception/imagenet_train --num_gpus=2 --batch_size=100 --train_dir='out/iia_results' --data_dir='out/iia_TFRecord_train' --ClassNumber=2 --mode='0_softmax' --NbrOfImages=712 --save_step_for_chekcpoint=200 --max_steps=2001
+01_training/xClasses/bazel-bin/inception/imagenet_train --num_gpus=2 --batch_size=100 --train_dir='out/iia_results' --data_dir='out/iia_TFRecord_train' --ClassNumber=3 --mode='0_softmax' --NbrOfImages=712 --save_step_for_chekcpoint=200 --max_steps=2001
 ```
 
 ## 2.5 Validating Results
 We just want to run out model on the validation set we created.
 ```
-python 02_testing/xClasses/nc_imagenet_eval.py --checkpoint_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_results/' --eval_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_valid' --data_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_TFRecord_valid'  --batch_size 300  --run_once --ImageSet_basename='valid_' --ClassNumber 1 --mode='0_softmax'  --TVmode='test'
+python 02_testing/xClasses/nc_imagenet_eval.py --checkpoint_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_results/' --eval_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/' --data_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_TFRecord_valid'  --batch_size 300  --run_once --ImageSet_basename='valid_' --ClassNumber 3 --mode='0_softmax'  --TVmode='test'
 ```
