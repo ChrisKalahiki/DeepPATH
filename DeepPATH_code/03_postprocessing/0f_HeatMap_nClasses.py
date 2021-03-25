@@ -302,12 +302,12 @@ def main():
 	else:
 		sys.exit("output path not defined or does not exist")
 		
-  # For each sufolder (class)
-  ## --> read all the test images in a loop
-  ## --> for each slide:
-  ##	Number of Tiles
-  ##	Number of Tiles classified in each class
-  ## 	Average score for each class (first sum then divide)
+	# For each sufolder (class)
+	## --> read all the test images in a loop
+	## --> for each slide:
+	##	Number of Tiles
+	##	Number of Tiles classified in each class
+	## 	Average score for each class (first sum then divide)
 
 	# Read out_filename stats:
 	stats_dict = dict_tiles_stats()
@@ -315,8 +315,8 @@ def main():
 	# Read the name of the folder (= class names)
 	sub_dirs = []
 	for item in os.listdir(image_dir):
-    		if os.path.isdir(os.path.join(image_dir, item)):
-        		sub_dirs.append(os.path.join(image_dir,item))
+			if os.path.isdir(os.path.join(image_dir, item)):
+				sub_dirs.append(os.path.join(image_dir,item))
 
 	#sub_dirs = [image_dir]
 
@@ -367,7 +367,7 @@ def main():
 			print("image not found:")
 			print(tile)
 			# break
-                        continue
+			continue
 
 		# remove slide number from image name:
 		cTileRootName =  '_'.join(os.path.basename(test_filename).split('_')[0:-2]) 
@@ -503,85 +503,84 @@ def main():
 
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser()
-  # classify_image_graph_def.pb:
-  #   Binary representation of the GraphDef protocol buffer.
-  # imagenet_synset_to_human_label_map.txt:
-  #   Map from synset ID to a human readable string.
-  # imagenet_2012_challenge_label_map_proto.pbtxt:
-  #   Text representation of a protocol buffer mapping a label to synset ID.
-  parser.add_argument(
-      '--model_dir',
-      type=str,
-      default='',
-      help="""\
-      Path to classify_image_graph_def.pb,
-      imagenet_synset_to_human_label_map.txt, and
-      imagenet_2012_challenge_label_map_proto.pbtxt.\
-      """
-  )
-  parser.add_argument(
-      '--image_file',
-      type=str,
-      default='',
-      help='Absolute path to image file.'
-  )
-  parser.add_argument(
-      '--tiles_overlap',
-      type=int,
-      default=0,
-      help='Overlap of the tiles in pixels.'
-  )
-  parser.add_argument(
-      '--output_dir',
-      type=str,
-      default='mustbedefined',
-      help='Output directory.'
-  )
-  parser.add_argument(
-      '--resample_factor',
-      type=int,
-      default=1,
-      help='reduce the size of the output by this factor.'
-  )
-  parser.add_argument(
-      '--tiles_size',
-      type=int,
-      default=512,
-      help='tile size in pixels.'
-  )
-  parser.add_argument(
-      '--tiles_stats',
-      type=str,
-      default='',
-      help='text file where tile statistics are saved.'
-  )
-  parser.add_argument(
-      '--slide_filter',
-      type=str,
-      default='',
-      help='process only images with this basename.'
-  )
-  parser.add_argument(
-      '--filter_tile',
-      type=str,
-      default='/OurSoftware/TCGA-05-5425/tmp_class_30perTF/out_filename_Stats.txt',
-      help='if map is a mutation, apply cmap of mutations only if tiles are LUAD.'
-  )
-  parser.add_argument(
-      '--Cmap',
-      type=str,
-      default='CancerType',
-      help='can be CancerType, of the name of a mutation (TP53, EGFR...)'
-  )
-  parser.add_argument(
-      '--thresholds',
-      type=str,
-      default=None,
-      help='thresholds to use for each label - string, for example: 0.285,0.288,0.628. If none, take the highest one.'
-  )
+	parser = argparse.ArgumentParser()
+	# classify_image_graph_def.pb:
+	#   Binary representation of the GraphDef protocol buffer.
+	# imagenet_synset_to_human_label_map.txt:
+	#   Map from synset ID to a human readable string.
+	# imagenet_2012_challenge_label_map_proto.pbtxt:
+	#   Text representation of a protocol buffer mapping a label to synset ID.
+	parser.add_argument(
+		'--model_dir',
+		type=str,
+		default='',
+		help="""\
+		Path to classify_image_graph_def.pb,
+		imagenet_synset_to_human_label_map.txt, and
+		imagenet_2012_challenge_label_map_proto.pbtxt.\
+		"""
+	)
+	parser.add_argument(
+		'--image_file',
+		type=str,
+		default='',
+		help='Absolute path to image file.'
+	)
+	parser.add_argument(
+		'--tiles_overlap',
+		type=int,
+		default=0,
+		help='Overlap of the tiles in pixels.'
+	)
+	parser.add_argument(
+		'--output_dir',
+		type=str,
+		default='mustbedefined',
+		help='Output directory.'
+	)
+	parser.add_argument(
+		'--resample_factor',
+		type=int,
+		default=1,
+		help='reduce the size of the output by this factor.'
+	)
+	parser.add_argument(
+		'--tiles_size',
+		type=int,
+		default=512,
+		help='tile size in pixels.'
+	)
+	parser.add_argument(
+		'--tiles_stats',
+		type=str,
+		default='',
+		help='text file where tile statistics are saved.'
+	)
+	parser.add_argument(
+		'--slide_filter',
+		type=str,
+		default='',
+		help='process only images with this basename.'
+	)
+	parser.add_argument(
+		'--filter_tile',
+		type=str,
+		default='/OurSoftware/TCGA-05-5425/tmp_class_30perTF/out_filename_Stats.txt',
+		help='if map is a mutation, apply cmap of mutations only if tiles are LUAD.'
+	)
+	parser.add_argument(
+		'--Cmap',
+		type=str,
+		default='CancerType',
+		help='can be CancerType, of the name of a mutation (TP53, EGFR...)'
+	)
+	parser.add_argument(
+		'--thresholds',
+		type=str,
+		default=None,
+		help='thresholds to use for each label - string, for example: 0.285,0.288,0.628. If none, take the highest one.'
+	)
 
-  FLAGS, unparsed = parser.parse_known_args()
-  main()
-  #tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
-
+	FLAGS, unparsed = parser.parse_known_args()
+	main()
+	#tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
