@@ -403,7 +403,7 @@ def main():
 			elif cTile<=0:
 				im2s = im2
 			else:
-				im2s = np.array(Image.fromarray(im2).resize(cTile, rTile))
+				im2s = np.array(Image.fromarray(im2).resize((cTile, rTile)))
 				rTile = im2s.shape[1]
 				cTile = im2s.shape[0]
 
