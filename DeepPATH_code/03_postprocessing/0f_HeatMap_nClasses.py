@@ -402,7 +402,7 @@ def main():
 			elif cTile<=0:
 				im2s = im2
 			else:
-				im2s = scipy.misc.imresize(im2, (cTile, rTile))
+				im2s = np.array(Image.fromarray(arr).resize(im2, (cTile, rTile)))
 				rTile = im2s.shape[1]
 				cTile = im2s.shape[0]
 
