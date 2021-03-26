@@ -78,12 +78,25 @@ mkdir out/iia_results
 ```
 
 ## 2.5 Validating Results
-We just want to run out model on the validation set we created.
+We just want to run our trained model on the test and validation sets we created.
 ```
-python 02_testing/xClasses/nc_imagenet_eval.py --checkpoint_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_results/' --eval_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/' --data_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_TFRecord_valid'  --batch_size 300  --run_once --ImageSet_basename='valid_' --ClassNumber 3 --mode='0_softmax'  --TVmode='test'
+python 02_testing/xClasses/nc_imagenet_eval.py --checkpoint_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_results/' --eval_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/' --data_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_TFRecord_test'  --batch_size 300  --run_once --ImageSet_basename='test_' --ClassNumber 3 --mode='0_softmax'  --TVmode='test'
+
+python 02_testing/xClasses/nc_imagenet_eval.py --checkpoint_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_results/' --eval_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/' --data_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_TFRecord_valid'  --batch_size 300  --run_once --ImageSet_basename='valid_' --ClassNumber 3 --mode='0_softmax'  --TVmode='valid'
 ```
 
 ## 3.1 Post-Processing
+Generate heat-maps per slides overlaid on original slide (all test slides in a given folder; code not optimized and slow):
 ```
-python 03_postprocessing/0f_HeatMap_nClasses.py  --image_file 'out/iia_sorted_3Cla' --tiles_overlap 0 --output_dir './out/Heatmap_out' --tiles_stats 'out_filename_Stats.txt' --resample_factor 10 --slide_filter '' --filter_tile '' --Cmap '' --tiles_size 512
+python 03_postprocessing/0f_HeatMap_nClasses.py  --image_file 'out/iia_sorted_3Cla' --tiles_overlap 0 --output_dir './out/Heatmap_out' --tiles_stats 'out_filename_Stats.txt' --resample_factor 10 --slide_filter 'test_' --filter_tile '' --Cmap '' --tiles_size 512
+```
+
+Generate heat-maps with no overlay (fast)
+```
+python 03_postprocessing/0g_HeatMap_MultiChannels.py --tiles_overlap=0 --tiles_size=512 --output_dir='out/CMap_output' --tiles_stats='out_filename_Stats.txt' --Classes='1,2,3' --slide_filter=''
+```
+
+To also get confidence intervals (Bootstrap technique), use this code:
+```
+python 03_postprocessing/0h_ROC_MultiOutput_BootStrap.py  --file_stats out_filename_Stats.txt  --output_dir out/ROC_out --labels_names labelref_r1.txt --ref_stats ''
 ```
