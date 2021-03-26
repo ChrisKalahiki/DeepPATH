@@ -82,3 +82,8 @@ We just want to run out model on the validation set we created.
 ```
 python 02_testing/xClasses/nc_imagenet_eval.py --checkpoint_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_results/' --eval_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/' --data_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_TFRecord_valid'  --batch_size 300  --run_once --ImageSet_basename='valid_' --ClassNumber 3 --mode='0_softmax'  --TVmode='test'
 ```
+
+## 3.1 Post-Processing
+```
+python 03_postprocessing/0f_HeatMap_nClasses.py  --image_file 'out/iia_sorted_3Cla' --tiles_overlap 0 --output_dir './out/Heatmap_out' --tiles_stats 'out_filename_Stats.txt' --resample_factor 10 --slide_filter '' --filter_tile '' --Cmap '' --tiles_size 512
+```
