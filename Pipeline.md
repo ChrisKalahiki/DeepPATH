@@ -31,7 +31,7 @@ env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
 ```
 This should create Bazel binaries in `~/bazel-src/output/`
 
-# 2. Normal Classification
+# 2. Classification
 It is important to note that this portion of the pipeline will involve moving to the proper directory in Palmetto.
 ```
 cd /zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code
@@ -85,18 +85,28 @@ python 02_testing/xClasses/nc_imagenet_eval.py --checkpoint_dir='/zfs/dzrptlab/b
 python 02_testing/xClasses/nc_imagenet_eval.py --checkpoint_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_results/' --eval_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/' --data_dir='/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_code/out/iia_TFRecord_valid'  --batch_size 300  --run_once --ImageSet_basename='valid_' --ClassNumber 3 --mode='0_softmax'  --TVmode='valid'
 ```
 
-## 3.1 Post-Processing
+# 3 Post-Processing
 Generate heat-maps per slides overlaid on original slide (all test slides in a given folder; code not optimized and slow):
+
+## 3.1 Heatmap with Overlay (Slow method)
 ```
 python 03_postprocessing/0f_HeatMap_nClasses.py  --image_file 'out/iia_sorted_3Cla' --tiles_overlap 0 --output_dir './out/Heatmap_out' --tiles_stats 'out_filename_Stats.txt' --resample_factor 10 --slide_filter 'test_' --filter_tile '' --Cmap '' --tiles_size 512
 ```
 
+## 3.2 Heatmap with no Overlay (Fast method)
 Generate heat-maps with no overlay (fast)
 ```
 python 03_postprocessing/0g_HeatMap_MultiChannels.py --tiles_overlap=0 --tiles_size=512 --output_dir='out/CMap_output' --tiles_stats='out_filename_Stats.txt' --Classes='1,2,3' --slide_filter=''
 ```
 
+## 3.3 Confidence Interval Information
 To also get confidence intervals (Bootstrap technique), use this code:
 ```
 python 03_postprocessing/0h_ROC_MultiOutput_BootStrap.py  --file_stats out_filename_Stats.txt  --output_dir out/ROC_out --labels_names labelref_r1.txt --ref_stats ''
+```
+
+# 4 Image Upload Pipeline
+When cropping, we want to keep the filenames the same. If possible, keep them in folders with race as that is not metadata kept on the SVS file.
+```
+scp -r [path to local images] username@palmetto.cs.clemson.edu:/zfs/dzrptlab/breastcancer/data_cropped/[path to folder]
 ```
