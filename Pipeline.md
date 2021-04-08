@@ -1,7 +1,7 @@
 # 1. Setup
 ## 1.1 Log into Palmetto
 ```
-alias palmetto='ssh <your username>@login.palmetto.clemson.edu'
+ssh <your username>@login.palmetto.clemson.edu
 ```
 
 ## 1.2 Start an interactive job
