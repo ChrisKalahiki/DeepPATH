@@ -108,5 +108,5 @@ python 03_postprocessing/0h_ROC_MultiOutput_BootStrap.py  --file_stats out_filen
 # 4 Image Upload Pipeline
 When cropping, we want to keep the filenames the same. If possible, keep them in folders with race as that is not metadata kept on the SVS file.
 ```
-scp -r [path to local images] username@palmetto.cs.clemson.edu:/zfs/dzrptlab/breastcancer/data_cropped/[path to folder]
+scp -r [path to local images] username@xfer-01.palmetto.clemson.edu:/zfs/dzrptlab/breastcancer/data_cropped/[path to folder]
 ```
