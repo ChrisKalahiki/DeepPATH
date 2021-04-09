@@ -74,7 +74,7 @@ Here we are going to train our inception model on the training set we created.
 ```
 mkdir out/iia_results
 
-01_training/xClasses/bazel-bin/inception/imagenet_train --num_gpus=2 --batch_size=100 --train_dir='out/iia_results' --data_dir='out/iia_TFRecord_train' --ClassNumber=3 --mode='0_softmax' --NbrOfImages=712 --save_step_for_chekcpoint=200 --max_steps=2001
+python 01_training/xClasses/bazel-bin/inception/imagenet_train --num_gpus=2 --batch_size=100 --train_dir='out/iia_results' --data_dir='out/iia_TFRecord_train' --ClassNumber=3 --mode='0_softmax' --NbrOfImages=712 --save_step_for_chekcpoint=200 --max_steps=2001
 ```
 
 ## 2.5 Validating Results
