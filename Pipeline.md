@@ -110,3 +110,14 @@ When cropping, we want to keep the filenames the same. If possible, keep them in
 ```
 scp -r [path to local images] username@xfer-01.palmetto.clemson.edu:/zfs/dzrptlab/breastcancer/data_cropped/[path to folder]
 ```
+
+# 5 HistomicsUI Web Application
+For the HistomicsUI Web Applciation, we have been using the Docker image provided by DigitalSlideArchive on GitHub. The URL for installing and setting up the Docker image can be found at the below URL.
+URL: https://github.com/DigitalSlideArchive/digital_slide_archive/blob/master/ansible/README.rst
+It should be noted that the instructions are designed for a Debian-based Linux installation. For Windows and MacOS, be sure to install Docker, Python, pip, and git beforehand.
+
+# 6 Cropping SVS Images
+For cropping the SVS images, we plan to use Dr. Iuricich's roi_necrosis repository. It is listed at the URL below.
+URL: https://github.com/IuricichF/roi_necrosis
+For the image cropping to work, the names of the annotations must be identical to the names of the original .SVS files. 
+Once you are finished annotating the slide, you will need to download the annotation. Visual instructions can be found in the README.md file in the roi_necrosis repository.
