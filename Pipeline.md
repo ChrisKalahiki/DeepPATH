@@ -110,6 +110,7 @@ When cropping, we want to keep the filenames the same. If possible, keep them in
 ```
 scp -r [path to local images] username@xfer-01.palmetto.clemson.edu:/zfs/dzrptlab/breastcancer/data_cropped/[path to folder]
 ```
+The data_cropped folder in Palmetto currently contains empty directories for AfricanAmerican, Caucasian, and Hispanic data. When uploading images, try to keep the images that are uploaded in the proper directory for the type of image. For example, if you are uploading a single image that belongs in the Caucasian set, you would replace [path to folder] with Caucasian/ followed by the name of the image. This would ensure that the image is uploaded to the Caucasian directory and the name of the image is preserved.
 
 # 5 HistomicsUI Web Application
 For the HistomicsUI Web Applciation, we have been using the Docker image provided by DigitalSlideArchive on GitHub. The URL for installing and setting up the Docker image can be found at the below URL.    
