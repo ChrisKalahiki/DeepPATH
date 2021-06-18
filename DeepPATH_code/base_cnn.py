@@ -6,8 +6,11 @@ Just need a quick script to run everything.
 '''
 
 import tensorflow as tf
-from tensorflow.keras import layers, models
-import random, os, collections
+from tensorflow.keras import layers, models, datasets
+import random, os, collections, io
+import matplotlib.pyplot as plt
+from PIL import Image
+import numpy as np
 # import matplotlib as pyplot
 
 # Import the data
@@ -19,7 +22,7 @@ def make_train_and_test_sets():
     train_examples, test_examples = [], []
     shuffler = random.Random()
     is_root = True
-    for (dirname, subdirs, filenames) in tf.io.gfile.walk('../../data_cropped/'):
+    for (dirname, subdirs, filenames) in tf.io.gfile.walk('/home/kalafreaky/code/data/'):
         # The root directory gives us the classes
         if is_root:
             subdirs = sorted(subdirs)
@@ -39,31 +42,57 @@ def make_train_and_test_sets():
             test_examples.extend(examples[num_train:])
     shuffler.shuffle(train_examples)
     shuffler.shuffle(test_examples)
-    return train_examples, test_examples, classes
+    
+    x_train = []
+    y_train = []
+    x_test = []
+    y_test = []
+    for x in train_examples:
+        tmp = Image.open(x[0]).resize((1116, 2011))
+        data = np.asarray(tmp)
+        x_train.append(data)
+#         x_train.append(x[0])
+        tmp = np.asarray([x[1]])
+        y_train.append(tmp)
+    for y in test_examples:
+        tmp = Image.open(y[0]).resize((1116, 2011))
+        data = np.asarray(tmp)
+        x_test.append(data)
+#         x_test.append(y[0])
+        tmp = np.asarray([y[1]])
+        y_test.append(tmp)
+    return x_train, y_train, x_test, y_test, classes
+
+TRAIN_SAMPLE, TRAIN_LABEL, TEST_SAMPLE, TEST_LABEL, CLASSES = make_train_and_test_sets()
+
+TRAIN_SAMPLE = np.array(TRAIN_SAMPLE)
+TEST_SAMPLE = np.array(TRAIN_SAMPLE)
+TRAIN_LABEL = np.array(TRAIN_LABEL)
+TEST_LABEL = np.array(TEST_LABEL)
 
 
 # This is the Keras-style CNN in TensorFlow
 model = models.Sequential()
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)))
+model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(2011, 1116, 3)))
 model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 
-model.summary()
+# model.summary()
 
 model.add(layers.Flatten())
 model.add(layers.Dense(64, activation='relu'))
 model.add(layers.Dense(10))
 
-model.summary()
+# model.summary()
 
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
-# history = model.fit(train_images, train_labels, epochs=10, 
-#                     validation_data=(test_images, test_labels))
+history = model.fit(train_images, train_labels, epochs=10, 
+                    validation_data=(test_images, test_labels))
 
 # plt.plot(history.history['accuracy'], label='accuracy')
 # plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
@@ -72,6 +101,6 @@ model.compile(optimizer='adam',
 # plt.ylim([0.5, 1])
 # plt.legend(loc='lower right')
 
-# test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
+test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
 
-# print(test_acc)
+print(test_acc)
