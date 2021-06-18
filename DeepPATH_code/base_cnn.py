@@ -22,7 +22,7 @@ def make_train_and_test_sets():
     train_examples, test_examples = [], []
     shuffler = random.Random()
     is_root = True
-    for (dirname, subdirs, filenames) in tf.io.gfile.walk('/home/kalafreaky/code/data/'):
+    for (dirname, subdirs, filenames) in tf.io.gfile.walk('/zfs/dzrptlab/breastcancer/data_cropped/'):
         # The root directory gives us the classes
         if is_root:
             subdirs = sorted(subdirs)
