@@ -91,8 +91,8 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
-history = model.fit(train_images, train_labels, epochs=10, 
-                    validation_data=(test_images, test_labels))
+history = model.fit(TRAIN_SAMPLE, TRAIN_LABEL, epochs=10, 
+                    validation_data=(TEST_SAMPLE, TEST_LABEL))
 
 # plt.plot(history.history['accuracy'], label='accuracy')
 # plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
@@ -101,6 +101,6 @@ history = model.fit(train_images, train_labels, epochs=10,
 # plt.ylim([0.5, 1])
 # plt.legend(loc='lower right')
 
-test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
+test_loss, test_acc = model.evaluate(TEST_SAMPLE,  TEST_LABEL, verbose=2)
 
 print(test_acc)
