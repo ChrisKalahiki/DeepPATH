@@ -22,7 +22,7 @@ def make_train_and_test_sets():
     train_examples, test_examples = [], []
     shuffler = random.Random()
     is_root = True
-    for (dirname, subdirs, filenames) in tf.io.gfile.walk('/zfs/dzrptlab/breastcancer/data_cropped/'):
+    for (dirname, subdirs, filenames) in tf.io.gfile.walk('C:\\Users\\chris\\code\\data_cropped\\'):
         # The root directory gives us the classes
         if is_root:
             subdirs = sorted(subdirs)
@@ -34,7 +34,7 @@ def make_train_and_test_sets():
             filenames.sort()
             shuffler.shuffle(filenames)
             full_filenames = [os.path.join(dirname, f) for f in filenames]
-            label = dirname.split('/')[-1] # '/' for linux and '\\' for windows
+            label = dirname.split('\\')[-1] # '/' for linux and '\\' for windows
             label_class = label_to_class[label]
             examples = list(zip(full_filenames, [label_class] * len(filenames)))
             num_train = int(len(filenames) * 0.7)
