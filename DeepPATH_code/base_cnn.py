@@ -22,7 +22,7 @@ def make_train_and_test_sets():
     train_examples, test_examples = [], []
     shuffler = random.Random()
     is_root = True
-    for (dirname, subdirs, filenames) in tf.io.gfile.walk('/home/kalafreaky/code/data/'):
+    for (dirname, subdirs, filenames) in tf.io.gfile.walk('/zfs/dzrptlab/breastcancer/data_cropped/'):
         # The root directory gives us the classes
         if is_root:
             subdirs = sorted(subdirs)
@@ -34,7 +34,7 @@ def make_train_and_test_sets():
             filenames.sort()
             shuffler.shuffle(filenames)
             full_filenames = [os.path.join(dirname, f) for f in filenames]
-            label = dirname.split('\\')[-1] # '/' for linux and '\\' for windows
+            label = dirname.split('/')[-1] # '/' for linux and '\\' for windows
             label_class = label_to_class[label]
             examples = list(zip(full_filenames, [label_class] * len(filenames)))
             num_train = int(len(filenames) * 0.7)
@@ -61,9 +61,9 @@ def make_train_and_test_sets():
 #         x_test.append(y[0])
         tmp = np.asarray([y[1]])
         y_test.append(tmp)
-    return x_train, y_train, x_test, y_test, classes
+    return x_train, y_train, x_test, y_test#, classes
 
-TRAIN_SAMPLE, TRAIN_LABEL, TEST_SAMPLE, TEST_LABEL, CLASSES = make_train_and_test_sets()
+TRAIN_SAMPLE, TRAIN_LABEL, TEST_SAMPLE, TEST_LABEL = make_train_and_test_sets()
 
 TRAIN_SAMPLE = np.array(TRAIN_SAMPLE)
 TEST_SAMPLE = np.array(TRAIN_SAMPLE)
@@ -91,8 +91,11 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
-for i in range(10):
-    history = model.fit(TRAIN_SAMPLE[(i*7):(i+6)], TRAIN_LABEL[(i*7):(i+6)], epochs=1)
+print(TRAIN_SAMPLE[0:7])
+print(TRAIN_LABEL[0:7])
+
+for i in range(7):
+    history = model.fit(TRAIN_SAMPLE[(i*10):(i+10)], TRAIN_LABEL[(i*10):(i+10)])
 
 # history = model.fit(TRAIN_SAMPLE, TRAIN_LABEL, epochs=1, 
 #                     validation_data=(TEST_SAMPLE, TEST_LABEL))
