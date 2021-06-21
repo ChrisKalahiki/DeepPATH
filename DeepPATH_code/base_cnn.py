@@ -22,7 +22,7 @@ def make_train_and_test_sets():
     train_examples, test_examples = [], []
     shuffler = random.Random()
     is_root = True
-    for (dirname, subdirs, filenames) in tf.io.gfile.walk('/zfs/dzrptlab/breastcancer/DeepPATH/DeepPATH_cropped/data_cropped/'):
+    for (dirname, subdirs, filenames) in tf.io.gfile.walk('/home/kalafreaky/code/data/'):
         # The root directory gives us the classes
         if is_root:
             subdirs = sorted(subdirs)
@@ -73,11 +73,11 @@ TEST_LABEL = np.array(TEST_LABEL)
 
 # This is the Keras-style CNN in TensorFlow
 model = models.Sequential()
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(2011, 1116, 3)))
+model.add(layers.Conv2D(32, (10, 10), activation='relu', input_shape=(2011, 1116, 3)))
 model.add(layers.MaxPooling2D((2, 2)))
-model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.Conv2D(64, (10, 10), activation='relu'))
 model.add(layers.MaxPooling2D((2, 2)))
-model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.Conv2D(64, (10, 10), activation='relu'))
 
 # model.summary()
 
@@ -91,8 +91,11 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
-history = model.fit(TRAIN_SAMPLE, TRAIN_LABEL, epochs=10, 
-                    validation_data=(TEST_SAMPLE, TEST_LABEL))
+for i in range(10):
+    history = model.fit(TRAIN_SAMPLE[(i*7):(i+6)], TRAIN_LABEL[(i*7):(i+6)], epochs=1)
+
+# history = model.fit(TRAIN_SAMPLE, TRAIN_LABEL, epochs=1, 
+#                     validation_data=(TEST_SAMPLE, TEST_LABEL))
 
 # plt.plot(history.history['accuracy'], label='accuracy')
 # plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
