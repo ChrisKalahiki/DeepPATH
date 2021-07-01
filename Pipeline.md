@@ -126,3 +126,12 @@ URL: https://github.com/IuricichF/roi_necrosis
     
 For the image cropping to work, the names of the annotations must be identical to the names of the original .SVS files. 
 Once you are finished annotating the slide, you will need to download the annotation. Visual instructions can be found in the README.md file in the roi_necrosis repository.
+
+# 6 Simple CNN with Our Data
+To run the Convolutional Neural Network with TensorFlow, run the following script:    
+
+```
+python base_cnn.py
+```
+
+This will print the progress of each batch of training as well as the ultimate accuracy. There are still a few lines that need to be changed, but the base_cnn.py script will split and shuffle the data in the data_cropped directory and run it through a simple convolutional neural network model.
