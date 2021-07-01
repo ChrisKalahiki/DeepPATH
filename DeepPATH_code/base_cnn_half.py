@@ -48,14 +48,14 @@ def make_train_and_test_sets():
     x_test = []
     y_test = []
     for x in train_examples:
-        tmp = Image.open(x[0]).resize((1116, 2011)) # Original: (1116, 2011)
+        tmp = Image.open(x[0]).resize((558, 1005)) # Original: (1116, 2011)
         data = np.asarray(tmp)
         x_train.append(data)
 #         x_train.append(x[0])
         tmp = np.asarray([x[1]])
         y_train.append(tmp)
     for y in test_examples:
-        tmp = Image.open(y[0]).resize((1116, 2011))
+        tmp = Image.open(y[0]).resize((558, 1005))
         data = np.asarray(tmp)
         x_test.append(data)
 #         x_test.append(y[0])
@@ -77,7 +77,7 @@ print(len(TEST_LABEL))
 
 # This is the Keras-style CNN in TensorFlow
 model = models.Sequential()
-model.add(layers.Conv2D(32, (10, 10), activation='relu', input_shape=(2011, 1116, 3)))
+model.add(layers.Conv2D(32, (10, 10), activation='relu', input_shape=(1005, 558, 3)))
 model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Conv2D(64, (10, 10), activation='relu'))
 model.add(layers.MaxPooling2D((2, 2)))
